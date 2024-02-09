@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TodoServicesJWTAPI.Data;
 
@@ -11,9 +12,11 @@ using TodoServicesJWTAPI.Data;
 namespace TodoServicesJWTAPI.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    partial class TodoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240209084358_migupdate")]
+    partial class migupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,7 +243,7 @@ namespace TodoServicesJWTAPI.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("TodoServicesJWTAPI.Models.Entities.ProductItem", b =>
+            modelBuilder.Entity("TodoServicesJWTAPI.Models.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -255,8 +258,8 @@ namespace TodoServicesJWTAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -352,7 +355,7 @@ namespace TodoServicesJWTAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TodoServicesJWTAPI.Models.Entities.ProductItem", b =>
+            modelBuilder.Entity("TodoServicesJWTAPI.Models.Entities.Product", b =>
                 {
                     b.HasOne("TodoServicesJWTAPI.Models.Entities.Category", "Category")
                         .WithMany("Products")

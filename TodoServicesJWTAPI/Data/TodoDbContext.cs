@@ -9,6 +9,8 @@ namespace TodoServicesJWTAPI.Data
         public TodoDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<TodoItem> TodoItems => Set<TodoItem>();
+        public DbSet<ProductItem> Products => Set<ProductItem>();
+        public DbSet<Category> Categories => Set<Category>();
 
     }
 }

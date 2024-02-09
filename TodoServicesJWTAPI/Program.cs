@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddSwagger();
 builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
 builder.Services.AddDomainServices();
-
+builder.Services.AddMemoryCache();
 builder.Services.AddTodoContext(builder.Configuration);
 var app = builder.Build();
 
@@ -21,6 +21,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseResponseCaching();
 
 app.UseAuthorization();
 

@@ -8,6 +8,7 @@ using TodoServicesJWTAPI.Auth;
 using TodoServicesJWTAPI.Data;
 using TodoServicesJWTAPI.Models.Entities;
 using TodoServicesJWTAPI.Providers;
+using TodoServicesJWTAPI.Services.Product;
 using TodoServicesJWTAPI.Services.Todo;
 
 namespace TodoServicesJWTAPI
@@ -86,6 +87,7 @@ namespace TodoServicesJWTAPI
         {
             services.AddScoped<ITodoService, TodoService>();
             services.AddScoped <IJwtService, JwtService>();
+            services.AddScoped<IProductService , ProductService>();
             services.AddScoped<IRequestUserProvider, RequestUserProvider>();
             return services;
         }
