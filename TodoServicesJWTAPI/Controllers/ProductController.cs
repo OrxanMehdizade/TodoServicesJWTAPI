@@ -108,7 +108,6 @@ namespace TodoServicesJWTAPI.Controllers
         {
             try
             {
-                // Anahtar oluşturma
                 var cacheKey = $"filtered_products_{request.Page}_{request.PageSize}_{category?.Id ?? 0}_{productDescAsc}_{minPrice ?? 0}_{maxPrice ?? 0}";
 
                 if (_memoryCache.TryGetValue<PagintionListDto<ProductItemDto>>(cacheKey, out var cachedResult))
