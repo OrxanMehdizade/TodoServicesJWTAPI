@@ -11,10 +11,12 @@ namespace TodoServicesJWTAPI.Services.Product
     public class ProductService : IProductService
     {
         private readonly TodoDbContext _context;
+        private readonly ILogger<ProductService>? _logger;
 
-        public ProductService(TodoDbContext context)
+        public ProductService(TodoDbContext context, ILogger<ProductService>? logger)
         {
             _context = context;
+            _logger = logger;
         }
 
 
@@ -48,6 +50,8 @@ namespace TodoServicesJWTAPI.Services.Product
                 var items = await query.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
                 var totalCount = await query.CountAsync();
 
+
+                _logger?.LogInformation("FilterAll method executed successfully!");
                 return new PagintionListDto<ProductItemDto>(
                     items.Select(p => new ProductItemDto
                     (
@@ -63,6 +67,7 @@ namespace TodoServicesJWTAPI.Services.Product
             }
             catch (Exception ex)
             {
+                _logger?.LogError(ex, "An error occurred in the FilterAll method.");
                 Console.WriteLine($"Error in Get All Products:{ex.Message}");
                 throw;
             }
@@ -92,6 +97,9 @@ namespace TodoServicesJWTAPI.Services.Product
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
 
+                _logger?.LogInformation("CreateProduct method executed successfully. Product ID: {ProductId}, Title: {ProductTitle}", product.Id, product.Title);
+
+
                 return new ProductItemDto(
                     title: product.Title,
                     price: product.Price,
@@ -100,6 +108,7 @@ namespace TodoServicesJWTAPI.Services.Product
             }
             catch (Exception ex)
             {
+                _logger?.LogError(ex, "An error occurred in the CreateProduct method.");
                 Console.WriteLine($"Error in Create Product:{ex.Message}");
                 throw;
             }
@@ -114,13 +123,15 @@ namespace TodoServicesJWTAPI.Services.Product
                 {
                     return false;
                 }
-
                 _context.Products.Remove(productItem);
                 await _context.SaveChangesAsync();
+
+                _logger?.LogInformation("DeleteProduct method executed successfully. Product ID: {ProductId}, Title: {ProductTitle}", productItem?.Id, productItem?.Title);
                 return true;
             }
             catch (Exception ex)
             {
+                _logger?.LogError(ex, "An error occurred in the DeleteProduct method.");
                 Console.WriteLine($"Error in Delete Product:{ex.Message}");
                 throw;
             }
@@ -132,6 +143,8 @@ namespace TodoServicesJWTAPI.Services.Product
             {
                 var productItem = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(e => e.Id == id);
 
+                _logger?.LogInformation("GetProduct method executed successfully. Product ID: {ProductId}, Title: {ProductTitle}", productItem?.Id, productItem?.Title);
+
                 return productItem is not null
                     ? new ProductItemDto(
                         title: productItem.Title,
@@ -142,6 +155,7 @@ namespace TodoServicesJWTAPI.Services.Product
             }
             catch (Exception ex)
             {
+                _logger?.LogError(ex, "An error occurred in the GetProduct method.");
                 Console.WriteLine($"Error in Get Product:{ex.Message}");
                 throw;
             }

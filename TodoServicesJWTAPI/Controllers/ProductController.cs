@@ -14,7 +14,7 @@ namespace TodoServicesJWTAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
