@@ -70,5 +70,19 @@ namespace TodoServicesJWTAPI.Controllers
             var result = await _todoService.GetAll(request.Page, request.PageSize, isCompleted, userInfo!);
             return result is not null ? result : null;
         }
+        [HttpGet("CheckEmails")]
+        public async Task<IActionResult> CheckAndSendEmails()
+        {
+            try
+            {
+                await _todoService.CheckDeadlineAndSendEmailsAsync();
+                return Ok("Emails sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }

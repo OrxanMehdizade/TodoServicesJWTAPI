@@ -11,5 +11,6 @@ namespace TodoServicesJWTAPI.Services.Todo
         Task<TodoItemDto> ChangeTodoItemStatus(int id, bool isCompleted, UserInfo info);
         Task<bool> DeleteTodo(int id, UserInfo info);
         Task<PagintionListDto<TodoItemDto>> GetAll(int page, int pageSize, bool? isComleted, UserInfo info);
+        Task CheckDeadlineAndSendEmailsAsync();
     }
 }
