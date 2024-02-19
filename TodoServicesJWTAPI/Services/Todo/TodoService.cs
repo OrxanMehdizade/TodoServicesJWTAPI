@@ -57,6 +57,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                     IsCompleted = false,
                     CreatedTime = DateTime.Now,
                     UpdatedTime = DateTime.Now,
+                    Deadline=request.Deadline,
                     UserId = info.id
                 };
 
@@ -163,14 +164,18 @@ namespace TodoServicesJWTAPI.Services.Todo
             try
             {
                 var todos = await _context.TodoItems
-                    .Where(i => i.Deadline.Date == DateTime.Today.AddDays(1))
+                    .Where(i => i.Deadline.Date == DateTime.Today.AddDays(1).Date)
                     .ToListAsync();
+
+                 Console.WriteLine(todos);
 
                 foreach (var todo in todos)
                 {
-                    var user = await _context.Users.FirstOrDefaultAsync(e => e.Id == todo.UserId);
-                    var userEmail = user.Email;
-                    var emailBody = $"Hello {user.UserName},\nYour task's due date is tomorrow ({todo.Deadline.ToShortDateString()}) will expire. Don't forget!";
+                    var userEmail = todo.User?.Email; 
+                    if (string.IsNullOrEmpty(userEmail))
+                        continue;
+
+                    var emailBody = $"Hello {todo.User.UserName},\nYour task's due date is tomorrow ({todo.Deadline.ToShortDateString()}) will expire. Don't forget!";
 
                     using (var message = new MailMessage())
                     {
@@ -181,7 +186,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                         using (var client = new SmtpClient("smtp.example.com"))
                         {
                             client.Port = 587;
-                            client.Credentials = new NetworkCredential("username", "password");
+                            client.Credentials = new NetworkCredential("adadada5@gmail.com", "düvdüvdüdvüdvüvdüdvü");
                             client.EnableSsl = true;
                             await client.SendMailAsync(message);
                         }
@@ -193,8 +198,8 @@ namespace TodoServicesJWTAPI.Services.Todo
                 Console.WriteLine($"Error in CheckDeadlineAndSendEmailsAsync: {ex.Message}");
                 throw;
             }
-
         }
+
 
     }
 }

@@ -96,7 +96,7 @@ namespace TodoServicesJWTAPI
 
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
         {
-            services.AddScoped<TodoBackgroundService>();
+            services.AddSingleton<TodoBackgroundService>();
             return services;
         }
 
