@@ -19,11 +19,6 @@ builder.Services.AddBackgroundServices();
 builder.Host.ConfigureSerilog();
 
 
-//Log.Logger=new LoggerConfiguration()
-//    .ReadFrom.Configuration(builder.Configuration)
-//    .CreateLogger();
-
-//builder.Host.UseSerilog();
 
 var app = builder.Build();
 

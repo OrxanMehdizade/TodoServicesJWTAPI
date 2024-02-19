@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Net;
 using TodoServicesJWTAPI.Data;
 using TodoServicesJWTAPI.Models.DTOs.Pagintions;
 using TodoServicesJWTAPI.Models.DTOs.Todo;
@@ -10,7 +12,6 @@ namespace TodoServicesJWTAPI.Services.Todo
     public class TodoService : ITodoService
     {
         private readonly TodoDbContext _context;
-
         public TodoService(TodoDbContext context)
         {
             _context = context;
@@ -20,7 +21,7 @@ namespace TodoServicesJWTAPI.Services.Todo
         {
             try
             {
-                var todoItem = await _context.TodoItems.Where(i=>i.UserId==info.id).FirstOrDefaultAsync(e => e.Id == id);
+                var todoItem = await _context.TodoItems.Where(i => i.UserId == info.id).FirstOrDefaultAsync(e => e.Id == id);
                 if (todoItem == null)
                 {
                     return null;
@@ -56,19 +57,19 @@ namespace TodoServicesJWTAPI.Services.Todo
                     IsCompleted = false,
                     CreatedTime = DateTime.Now,
                     UpdatedTime = DateTime.Now,
-                    UserId=info.id
+                    UserId = info.id
                 };
 
                 await _context.TodoItems.AddAsync(todoItem);
                 await _context.SaveChangesAsync();
-                var Item=await _context.TodoItems.Where(i => i.UserId == info.id).OrderBy(i=>i.Id).LastAsync();
+                var Item = await _context.TodoItems.Where(i => i.UserId == info.id).OrderBy(i => i.Id).LastAsync();
 
                 return new TodoItemDto(
                         id: Item.Id,
                         text: Item.Text,
                         isCompleted: Item.IsCompleted,
                         createdTime: Item.CreatedTime,
-                        deadline:Item.Deadline);
+                        deadline: Item.Deadline);
             }
             catch (Exception ex)
             {
@@ -78,7 +79,7 @@ namespace TodoServicesJWTAPI.Services.Todo
 
         }
 
-        public async Task<bool> DeleteTodo(int id,UserInfo info)
+        public async Task<bool> DeleteTodo(int id, UserInfo info)
         {
             try
             {
@@ -101,7 +102,7 @@ namespace TodoServicesJWTAPI.Services.Todo
 
         }
 
-        public async Task<PagintionListDto<TodoItemDto>> GetAll(int page, int pageSize, bool? isComleted,UserInfo info)
+        public async Task<PagintionListDto<TodoItemDto>> GetAll(int page, int pageSize, bool? isComleted, UserInfo info)
         {
             try
             {
@@ -119,7 +120,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                         text: e.Text,
                         isCompleted: e.IsCompleted,
                         createdTime: e.CreatedTime,
-                        deadline:e.Deadline
+                        deadline: e.Deadline
 
                         )),
                     new PagintionMeta(page, pageSize, totalCount)
@@ -147,7 +148,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                         text: todoItem.Text,
                         isCompleted: todoItem.IsCompleted,
                         createdTime: todoItem.CreatedTime,
-                        deadline:todoItem.Deadline)
+                        deadline: todoItem.Deadline)
                     : null;
             }
             catch (Exception ex)
@@ -156,5 +157,44 @@ namespace TodoServicesJWTAPI.Services.Todo
                 throw;
             }
         }
+
+        public async Task CheckDeadlineAndSendEmailsAsync()
+        {
+            try
+            {
+                var todos = await _context.TodoItems
+                    .Where(i => i.Deadline.Date == DateTime.Today.AddDays(1))
+                    .ToListAsync();
+
+                foreach (var todo in todos)
+                {
+                    var user = await _context.Users.FirstOrDefaultAsync(e => e.Id == todo.UserId);
+                    var userEmail = user.Email;
+                    var emailBody = $"Hello {user.UserName},\nYour task's due date is tomorrow ({todo.Deadline.ToShortDateString()}) will expire. Don't forget!";
+
+                    using (var message = new MailMessage())
+                    {
+                        message.To.Add(userEmail);
+                        message.Subject = "Your Task Deadline is Approaching";
+                        message.Body = emailBody;
+
+                        using (var client = new SmtpClient("smtp.example.com"))
+                        {
+                            client.Port = 587;
+                            client.Credentials = new NetworkCredential("username", "password");
+                            client.EnableSsl = true;
+                            await client.SendMailAsync(message);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CheckDeadlineAndSendEmailsAsync: {ex.Message}");
+                throw;
+            }
+
+        }
+
     }
 }

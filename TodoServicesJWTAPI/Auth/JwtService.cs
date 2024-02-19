@@ -23,12 +23,13 @@ namespace TodoServicesJWTAPI.Auth
                 new Claim(ClaimsIdentity.DefaultRoleClaimType,string.Join(",",roles)),
 
             }.Concat(userClaims);
+            //var expires = DateTime.Now.AddMinutes(_jwtConfig.ExpiresMinutes);
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Secret));
             var signingCredentials= new SigningCredentials(key,SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
                 issuer: _jwtConfig.Issuer,
                 audience: _jwtConfig.Audience,
-                expires: DateTime.Now.AddMinutes(_jwtConfig.ExpiresMinutes),
+                expires: DateTime.Now.AddMinutes(_jwtConfig.ExpiresMinutes + 300000),
                 signingCredentials: signingCredentials,
                 claims:claims
                 );

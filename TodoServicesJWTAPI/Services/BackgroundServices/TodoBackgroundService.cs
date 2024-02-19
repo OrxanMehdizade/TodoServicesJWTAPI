@@ -1,19 +1,43 @@
-﻿namespace TodoServicesJWTAPI.Services.BackgroundServices
+﻿using TodoServicesJWTAPI.Services.Todo;
+
+namespace TodoServicesJWTAPI.Services.BackgroundServices
 {
-    public class TodoBackgroundService : IHostedService
+    public class TodoBackgroundService : IHostedService, IDisposable
     {
-        Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        private readonly IServiceProvider _serviceProvider;
+        private Timer _timer;
+
+        public TodoBackgroundService(IServiceProvider serviceProvider)
         {
-            Console.WriteLine("background Service Started");
+            _serviceProvider = serviceProvider;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            Console.WriteLine("Background Service Started");
+            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromDays(1));
             return Task.CompletedTask;
         }
 
-
-
-        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        public async void DoWork(object? state)
         {
-            Console.WriteLine("background Service Stoped");
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var todoService = scope.ServiceProvider.GetRequiredService<TodoService>();
+                await todoService.CheckDeadlineAndSendEmailsAsync();
+            }
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            Console.WriteLine("Background Service Stopped");
+            _timer?.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
         }
     }
 }
