@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 using TodoServicesJWTAPI.Auth;
 using TodoServicesJWTAPI.Data;
 using TodoServicesJWTAPI.Models.Entities;
 using TodoServicesJWTAPI.Providers;
+using TodoServicesJWTAPI.Services.BackgroundServices;
 using TodoServicesJWTAPI.Services.Product;
 using TodoServicesJWTAPI.Services.Todo;
 
@@ -90,6 +92,24 @@ namespace TodoServicesJWTAPI
             services.AddScoped<IProductService , ProductService>();
             services.AddScoped<IRequestUserProvider, RequestUserProvider>();
             return services;
+        }
+
+        public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
+        {
+            services.AddHostedService<TodoBackgroundService>();
+            return services;
+        }
+
+        public static IHostBuilder ConfigureSerilog(this IHostBuilder hostBuilder)
+        {
+            hostBuilder.ConfigureLogging((context, loggingBuilder) =>
+            {
+                Log.Logger=new LoggerConfiguration()
+                .ReadFrom.Configuration(context.Configuration)
+                .CreateLogger();
+                loggingBuilder.AddSerilog(dispose:true);
+            });
+            return hostBuilder;
         }
     }
 }

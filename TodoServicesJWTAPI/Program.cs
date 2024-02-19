@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Serilog;
 using TodoServicesJWTAPI;
+using TodoServicesJWTAPI.Services.BackgroundServices;
 using TodoServicesJWTAPI.Services.Product;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,13 +15,15 @@ builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
 builder.Services.AddDomainServices();
 builder.Services.AddMemoryCache();
 builder.Services.AddTodoContext(builder.Configuration);
+builder.Services.AddBackgroundServices();
+builder.Host.ConfigureSerilog();
 
 
-Log.Logger=new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
+//Log.Logger=new LoggerConfiguration()
+//    .ReadFrom.Configuration(builder.Configuration)
+//    .CreateLogger();
 
-builder.Host.UseSerilog();
+//builder.Host.UseSerilog();
 
 var app = builder.Build();
 

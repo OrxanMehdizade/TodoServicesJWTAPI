@@ -34,7 +34,8 @@ namespace TodoServicesJWTAPI.Services.Todo
                         id: todoItem.Id,
                         text: todoItem.Text,
                         isCompleted: todoItem.IsCompleted,
-                        createdTime: todoItem.CreatedTime);
+                        createdTime: todoItem.CreatedTime,
+                        deadline: todoItem.Deadline);
 
             }
             catch (Exception ex)
@@ -66,7 +67,8 @@ namespace TodoServicesJWTAPI.Services.Todo
                         id: Item.Id,
                         text: Item.Text,
                         isCompleted: Item.IsCompleted,
-                        createdTime: Item.CreatedTime);
+                        createdTime: Item.CreatedTime,
+                        deadline:Item.Deadline);
             }
             catch (Exception ex)
             {
@@ -116,7 +118,8 @@ namespace TodoServicesJWTAPI.Services.Todo
                         id: e.Id,
                         text: e.Text,
                         isCompleted: e.IsCompleted,
-                        createdTime: e.CreatedTime
+                        createdTime: e.CreatedTime,
+                        deadline:e.Deadline
 
                         )),
                     new PagintionMeta(page, pageSize, totalCount)
@@ -143,7 +146,8 @@ namespace TodoServicesJWTAPI.Services.Todo
                         id: todoItem.Id,
                         text: todoItem.Text,
                         isCompleted: todoItem.IsCompleted,
-                        createdTime: todoItem.CreatedTime)
+                        createdTime: todoItem.CreatedTime,
+                        deadline:todoItem.Deadline)
                     : null;
             }
             catch (Exception ex)
