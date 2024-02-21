@@ -5,7 +5,7 @@
 namespace TodoServicesJWTAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class miglog : Migration
+    public partial class mig6 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

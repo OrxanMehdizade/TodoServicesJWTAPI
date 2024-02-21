@@ -1,43 +1,68 @@
-﻿using TodoServicesJWTAPI.Services.Todo;
+﻿using MimeKit;
+using MailKit.Net.Smtp;
+using TodoServicesJWTAPI.Data;
+
 
 namespace TodoServicesJWTAPI.Services.BackgroundServices
 {
-    public class TodoBackgroundService : IHostedService, IDisposable
+    public class TodoBackgroundService : BackgroundService
     {
-        private readonly IServiceProvider _serviceProvider;
-        private Timer _timer;
+        private readonly IServiceProvider _services;
 
-        public TodoBackgroundService(IServiceProvider serviceProvider)
+        public TodoBackgroundService(IServiceProvider services)
         {
-            _serviceProvider = serviceProvider;
+            _services = services;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Console.WriteLine("Background Service Started");
-            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromDays(1));
-            return Task.CompletedTask;
-        }
-
-        public async void DoWork(object? state)
-        {
-            using (var scope = _serviceProvider.CreateScope())
+            while (!stoppingToken.IsCancellationRequested)
             {
-                var todoService = scope.ServiceProvider.GetRequiredService<TodoService>();
-                await todoService.CheckDeadlineAndSendEmailsAsync();
+                try
+                {
+                    using (var scope = _services.CreateScope())
+                    {
+                        var dbContext = scope.ServiceProvider.GetRequiredService<TodoDbContext>();
+                        var tasks = dbContext.TodoItems.ToList();
+
+                        foreach (var task in tasks)
+                        {
+                            string subject = "Task Deadline Reminder";
+                            string message = $"The deadline for task '{task.Text}' is tomorrow. Please complete it on time.";
+                            await SendEmailAsync(dbContext.Users.FirstOrDefault(u => u.Id == task.UserId)?.Email, subject, message);
+                        }
+                    }
+                    await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error occurred: {ex.Message}");
+                }
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task SendEmailAsync(string? email, string subject, string message)
         {
-            Console.WriteLine("Background Service Stopped");
-            _timer?.Change(Timeout.Infinite, 0);
-            return Task.CompletedTask;
-        }
+            try
+            {
+                var emailMessage = new MimeMessage();
+                emailMessage.From.Add(new MailboxAddress("Your Name", "mehdizadeorxan2000@gmail.com"));
+                emailMessage.To.Add(new MailboxAddress("Recipient", email)); 
+                emailMessage.Subject = subject;
+                emailMessage.Body = new TextPart("plain") { Text = message };
 
-        public void Dispose()
-        {
-            _timer?.Dispose();
+                using var client = new SmtpClient();
+                client.Connect("smtp.gmail.com", 587,true);
+                client.Authenticate("mehdizadeorxan2000@gmail.com", "aekuvdvvjfgoofpw");
+                client.Send(emailMessage);
+                client.Disconnect(true);
+
+                Console.WriteLine("Email sent successfully!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send email: {ex.Message}");
+            }
         }
     }
 }

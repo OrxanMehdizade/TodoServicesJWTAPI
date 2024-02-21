@@ -12,8 +12,8 @@ using TodoServicesJWTAPI.Data;
 namespace TodoServicesJWTAPI.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20240219160422_mig05")]
-    partial class mig05
+    [Migration("20240221110748_mig5")]
+    partial class mig5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

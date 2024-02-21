@@ -35,8 +35,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                         id: todoItem.Id,
                         text: todoItem.Text,
                         isCompleted: todoItem.IsCompleted,
-                        createdTime: todoItem.CreatedTime,
-                        deadline: todoItem.Deadline);
+                        createdTime: todoItem.CreatedTime);
 
             }
             catch (Exception ex)
@@ -57,7 +56,6 @@ namespace TodoServicesJWTAPI.Services.Todo
                     IsCompleted = false,
                     CreatedTime = DateTime.Now,
                     UpdatedTime = DateTime.Now,
-                    Deadline=request.Deadline,
                     UserId = info.id
                 };
 
@@ -69,8 +67,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                         id: Item.Id,
                         text: Item.Text,
                         isCompleted: Item.IsCompleted,
-                        createdTime: Item.CreatedTime,
-                        deadline: Item.Deadline);
+                        createdTime: Item.CreatedTime);
             }
             catch (Exception ex)
             {
@@ -120,8 +117,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                         id: e.Id,
                         text: e.Text,
                         isCompleted: e.IsCompleted,
-                        createdTime: e.CreatedTime,
-                        deadline: e.Deadline
+                        createdTime: e.CreatedTime
 
                         )),
                     new PagintionMeta(page, pageSize, totalCount)
@@ -148,8 +144,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                         id: todoItem.Id,
                         text: todoItem.Text,
                         isCompleted: todoItem.IsCompleted,
-                        createdTime: todoItem.CreatedTime,
-                        deadline: todoItem.Deadline)
+                        createdTime: todoItem.CreatedTime)
                     : null;
             }
             catch (Exception ex)
