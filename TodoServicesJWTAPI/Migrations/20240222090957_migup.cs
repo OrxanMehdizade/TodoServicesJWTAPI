@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TodoServicesJWTAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class mig5 : Migration
+    public partial class migup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

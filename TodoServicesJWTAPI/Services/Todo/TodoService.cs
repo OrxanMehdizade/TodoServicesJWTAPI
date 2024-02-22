@@ -56,6 +56,7 @@ namespace TodoServicesJWTAPI.Services.Todo
                     IsCompleted = false,
                     CreatedTime = DateTime.Now,
                     UpdatedTime = DateTime.Now,
+                    Deadline=request.Deadline,
                     UserId = info.id
                 };
 
