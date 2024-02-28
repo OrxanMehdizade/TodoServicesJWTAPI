@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using RabbitMQ.Client;
 using Serilog;
 using TodoServicesJWTAPI;
+using TodoServicesJWTAPI.Configurations;
 using TodoServicesJWTAPI.Services.BackgroundServices;
 using TodoServicesJWTAPI.Services.Product;
 
@@ -17,6 +19,25 @@ builder.Services.AddMemoryCache();
 builder.Services.AddTodoContext(builder.Configuration);
 builder.Services.AddBackgroundServices();
 builder.Host.ConfigureSerilog();
+
+
+var section = builder.Configuration.GetSection("RabbitMQ");
+var rabbitMQConfiguration = new RabbitMQConfiguration();
+section.Bind(rabbitMQConfiguration);
+
+builder.Services.AddSingleton(rabbitMQConfiguration);
+
+builder.Services.AddSingleton<IConnectionFactory, ConnectionFactory>(sp =>
+{
+    var factory = new ConnectionFactory
+    {
+        HostName=rabbitMQConfiguration.HostName, 
+        UserName=rabbitMQConfiguration.UserName,
+        Password = rabbitMQConfiguration.Password,
+        Port =rabbitMQConfiguration.Port
+    };
+    return factory;
+});
 
 
 

@@ -11,6 +11,7 @@ using TodoServicesJWTAPI.Models.Entities;
 using TodoServicesJWTAPI.Providers;
 using TodoServicesJWTAPI.Services.BackgroundServices;
 using TodoServicesJWTAPI.Services.Product;
+using TodoServicesJWTAPI.Services.RabbitMQ;
 using TodoServicesJWTAPI.Services.Todo;
 
 namespace TodoServicesJWTAPI
@@ -89,8 +90,10 @@ namespace TodoServicesJWTAPI
         {
             services.AddScoped<ITodoService, TodoService>();
             services.AddScoped <IJwtService, JwtService>();
+            services.AddSingleton<IRabbitMQService, RabbitMQService>();
             services.AddScoped<IProductService , ProductService>();
             services.AddScoped<IRequestUserProvider, RequestUserProvider>();
+
             return services;
         }
 

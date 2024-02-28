@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TodoServicesJWTAPI.Auth;
+using TodoServicesJWTAPI.Configurations;
 using TodoServicesJWTAPI.Models.DTOs.Auth;
 using TodoServicesJWTAPI.Models.Entities;
+using TodoServicesJWTAPI.Services.RabbitMQ;
 
 namespace TodoServicesJWTAPI.Controllers
 {
@@ -15,12 +17,16 @@ namespace TodoServicesJWTAPI.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IJwtService _jwtService;
+        private readonly IRabbitMQService _rabbitMQService;
+        private readonly RabbitMQConfiguration _rabbitMQConfiguration;
 
-        public AuthController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IJwtService jwtService)
+        public AuthController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IJwtService jwtService, IRabbitMQService rabbitMQService, RabbitMQConfiguration rabbitMQConfiguration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
+            _rabbitMQService = rabbitMQService;
+            _rabbitMQConfiguration = rabbitMQConfiguration;
         }
 
         private async Task<AuthTokenDto> GenerateToken(AppUser user)
@@ -41,11 +47,13 @@ namespace TodoServicesJWTAPI.Controllers
         [HttpPost("Register")]
         public async Task<ActionResult<AuthTokenDto>> Register(RegisterRequest request)
         {
+            _rabbitMQService.Publish<RegisterRequest>(request, _rabbitMQConfiguration.QueueName);
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
             if (existingUser is not null)
             {
                 return Conflict("User already exist!");
             }
+            
             var user = new AppUser
             {
                 UserName = request.Email,
